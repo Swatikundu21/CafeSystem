@@ -9,6 +9,7 @@ import { db } from '../database/db.ts';
 import { MenuService } from '../module1_menu/menuService.ts';
 import { calculateBill, calculateLineTotal, validateQuantity } from './billingEngine.ts';
 import { CartItem, CreateOrderPayload, Order, OrderItem } from './types.ts';
+import { jiraSyncService } from '../services/jiraSyncService.ts';
 
 export class OrderService {
   /**
@@ -162,14 +163,12 @@ export class OrderService {
     db.saveOrderTransaction(newOrder, orderItems);
 
     // Dispatch event to Jira Cloud project SCRUM
-    import('../services/jiraSyncService.ts').then(({ jiraSyncService }) => {
-      const itemListStr = newOrder.items.map((i) => `${i.itemName} (x${i.quantity})`).join(', ');
-      jiraSyncService.logEvent({
-        type: 'order_created',
-        summary: `[Order Placed] ${newOrder.orderNumber} - ₹${newOrder.grandTotal.toFixed(2)} (${newOrder.customerName})`,
-        details: `Order Transaction Persisted:\nOrder: ${newOrder.orderNumber}\nCustomer: ${newOrder.customerName}\nSubtotal: ₹${newOrder.subtotal.toFixed(2)}\nDiscount: ₹${newOrder.discountAmount.toFixed(2)} (${newOrder.discountPercent}%)\nGST: ₹${newOrder.gstAmount.toFixed(2)}\nGrand Total: ₹${newOrder.grandTotal.toFixed(2)}\nPayment: ${newOrder.paymentMethod}\nItems: ${itemListStr}`,
-        issueType: 'Task',
-      });
+    const itemListStr = newOrder.items.map((i) => `${i.itemName} (x${i.quantity})`).join(', ');
+    jiraSyncService.logEvent({
+      type: 'order_created',
+      summary: `[Order Placed] ${newOrder.orderNumber} - ₹${newOrder.grandTotal.toFixed(2)} (${newOrder.customerName})`,
+      details: `Order Transaction Persisted:\nOrder: ${newOrder.orderNumber}\nCustomer: ${newOrder.customerName}\nSubtotal: ₹${newOrder.subtotal.toFixed(2)}\nDiscount: ₹${newOrder.discountAmount.toFixed(2)} (${newOrder.discountPercent}%)\nGST: ₹${newOrder.gstAmount.toFixed(2)}\nGrand Total: ₹${newOrder.grandTotal.toFixed(2)}\nPayment: ${newOrder.paymentMethod}\nItems: ${itemListStr}`,
+      issueType: 'Task',
     }).catch(() => {});
 
     return { success: true, order: newOrder };

@@ -21,6 +21,7 @@ import { Order } from './module2_billing/types.ts';
 import { db } from './database/db.ts';
 import { MenuService } from './module1_menu/menuService.ts';
 import { OrderService } from './module2_billing/orderService.ts';
+import { jiraSyncService } from './services/jiraSyncService.ts';
 import { AlertCircle, CheckCircle, Database, Download, RotateCcw } from 'lucide-react';
 
 export default function App() {
@@ -58,13 +59,11 @@ export default function App() {
     setShowResetModal(false);
     showToast('Database reset to authentic baseline seeds!');
 
-    import('./services/jiraSyncService.ts').then(({ jiraSyncService }) => {
-      jiraSyncService.logEvent({
-        type: 'system_reset',
-        summary: '[System Event] Relational Database Reset to Factory Seeds',
-        details: 'Manager reset the catalog and transaction ledger back to baseline seeds.',
-        issueType: 'Task',
-      });
+    jiraSyncService.logEvent({
+      type: 'system_reset',
+      summary: '[System Event] Relational Database Reset to Factory Seeds',
+      details: 'Manager reset the catalog and transaction ledger back to baseline seeds.',
+      issueType: 'Task',
     }).catch(() => {});
   };
 

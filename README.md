@@ -217,9 +217,16 @@ This repository is pre-configured for seamless 1-click deployment to [Vercel](ht
    vercel --prod
    ```
 
-3. **Vercel Routing & Configuration (`vercel.json`)**:
-   - Single Page Application (SPA) fallback rewrites `/(.*)` to `/index.html` so tab navigation and page reloads work smoothly.
-   - Static assets under `/assets/` are automatically configured with long-term immutable cache headers.
+3. **Vercel Routing & Serverless Function Configuration (`vercel.json`)**:
+   - **SPA Routing**: Uses `/((?!api/.*).*)` rewrite so that client-side routes navigate smoothly to `/index.html` while preserving `/api/*` for Vercel Serverless Functions.
+   - **Serverless API**: `/api/jira.ts` runs on `@vercel/node` to provide a secure gateway for Atlassian Jira Cloud synchronization and CORS management.
+   - **Static Caching**: Static chunks under `/assets/` are automatically served with 1-year immutable caching.
+   - **Environment Variables (Optional)**:
+     - `JIRA_HOST` (e.g., `https://rbunagpur-team-rkyww9x4.atlassian.net`)
+     - `JIRA_PROJECT_KEY` (e.g., `SCRUM`)
+     - `JIRA_EMAIL` (e.g., `24kundus@rbunagpur.in`)
+     - `JIRA_API_TOKEN` (Generated from Atlassian security profile)
+     - `JIRA_WEBHOOK_URL` (Optional incoming webhook)
 
 ---
 

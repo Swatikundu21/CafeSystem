@@ -37,7 +37,7 @@ function jiraApiPlugin() {
               },
             };
             const handler = (await import('./api/jira.ts')).default;
-            await handler(fakeReq, fakeRes);
+            await handler(fakeReq as any, fakeRes as any);
           } catch (err: any) {
             res.statusCode = 500;
             res.end(JSON.stringify({ error: err.message || 'Error processing request' }));
@@ -53,7 +53,7 @@ export default defineConfig(() => {
     plugins: [react(), tailwindcss(), jiraApiPlugin()],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, '.'),
+        '@': path.resolve(import.meta.dirname || process.cwd(), '.'),
       },
     },
     server: {

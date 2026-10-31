@@ -17,6 +17,7 @@ import {
 import { TestCaseResult, TestRegistry, TestSuiteResult } from './testRunner.ts';
 import { registerMenuValidationTests } from './validation.test.ts';
 import { registerBillingTests } from './billing.test.ts';
+import { jiraSyncService } from '../services/jiraSyncService.ts';
 
 // Ensure tests are registered once
 let registered = false;
@@ -51,13 +52,11 @@ export const TestRunnerView: React.FC = () => {
     const totalPassed = results.reduce((acc, s) => acc + s.passed, 0);
     const totalFailed = results.reduce((acc, s) => acc + s.failed, 0);
     const totalTests = totalPassed + totalFailed;
-    import('../services/jiraSyncService.ts').then(({ jiraSyncService }) => {
-      jiraSyncService.logEvent({
-        type: 'test_run',
-        summary: `[QA Test Run] ${totalPassed}/${totalTests} Passed (${totalFailed === 0 ? '100% Success' : `${totalFailed} Failed`})`,
-        details: `Automated QA Suite Execution:\nSuites: ${results.map((r) => r.suiteName).join(', ')}\nTotal: ${totalTests}\nPassed: ${totalPassed}\nFailed: ${totalFailed}\nExecution Duration: ${results.reduce((acc, s) => acc + s.durationMs, 0).toFixed(1)}ms`,
-        issueType: totalFailed > 0 ? 'Bug' : 'Task',
-      });
+    jiraSyncService.logEvent({
+      type: 'test_run',
+      summary: `[QA Test Run] ${totalPassed}/${totalTests} Passed (${totalFailed === 0 ? '100% Success' : `${totalFailed} Failed`})`,
+      details: `Automated QA Suite Execution:\nSuites: ${results.map((r) => r.suiteName).join(', ')}\nTotal: ${totalTests}\nPassed: ${totalPassed}\nFailed: ${totalFailed}\nExecution Duration: ${results.reduce((acc, s) => acc + s.durationMs, 0).toFixed(1)}ms`,
+      issueType: totalFailed > 0 ? 'Bug' : 'Task',
     }).catch(() => {});
   };
 

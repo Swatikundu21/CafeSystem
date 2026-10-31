@@ -8,7 +8,9 @@
  * Project: SCRUM
  */
 
-export default async function handler(req: any, res: any) {
+import type { VercelRequest, VercelResponse } from '@vercel/node';
+
+export default async function handler(req: VercelRequest, res: VercelResponse) {
   // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -22,12 +24,32 @@ export default async function handler(req: any, res: any) {
     return res.status(200).end();
   }
 
+  // GET health check for Vercel deployment verification
+  if (req.method === 'GET') {
+    return res.status(200).json({
+      status: 'ok',
+      service: 'CafeMaster Jira API Gateway',
+      environment: 'vercel-serverless',
+      projectKey: process.env.JIRA_PROJECT_KEY || 'SCRUM',
+      host: process.env.JIRA_HOST || 'https://rbunagpur-team-rkyww9x4.atlassian.net',
+      timestamp: new Date().toISOString(),
+    });
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed. Use POST.' });
   }
 
   try {
-    const { action, host, projectKey, email, apiToken, summary, description, issueType } = req.body || {};
+    let body = req.body;
+    if (typeof body === 'string') {
+      try {
+        body = JSON.parse(body);
+      } catch {
+        body = {};
+      }
+    }
+    const { action, host, projectKey, email, apiToken, summary, description, issueType } = body || {};
 
     const jiraHost = (host || process.env.JIRA_HOST || 'https://rbunagpur-team-rkyww9x4.atlassian.net').replace(/\/$/, '');
     const jiraEmail = email || process.env.JIRA_EMAIL || '24kundus@rbunagpur.in';

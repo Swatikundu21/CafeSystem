@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Remix CafeMaster - Cafe Management System",
+  "description": "Production-grade Cafe Management System with Menu Management, Order \u0026 Billing POS, live relational database persistence, unit testing suite, and JIRA QA test documentation.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
